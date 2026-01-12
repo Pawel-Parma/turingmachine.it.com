@@ -1,0 +1,4 @@
+public/js/**/*.d.ts
+public/js/**/*.ts.map
+public/js/**/*.js.map
+public/js/**/*.tsbuildinfo
