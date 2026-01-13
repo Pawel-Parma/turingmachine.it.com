@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- TODO: add format definition to action, format SYMBOL: MOVE, SYMBOL: { WRITE, MOVE, NEXTSTATE }, 
-     SYMBOL: { write: WRITE, move: MOVE, nextState: NEXTSTATE }, 
--->
-
 <head>
     <meta charset="UTF-8">
     <title>Turing Machine Simulator</title>
     <link rel="stylesheet" href="./css/index.css" defer>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js" defer></script>
     <script type="module" src="./js/main.js" defer></script>
-    </style>
 </head>
 
 <body>
@@ -22,20 +17,20 @@
     <main>
         <section id="descriptionSection">
             <textarea id="yamlInput" style="height: 250px; width: 600px;"></textarea>
-            <button id="loadYamlBtn">Load YAML</button>
+            <button id="loadYamlButton">Load YAML</button>
         </section>
 
         <section id="tapeSection">
             <input id="tapeInput" type="text">
-            <button id="loadTapeBtn">Load Tape</button>
+            <button id="loadTapeButton">Load Tape</button>
         </section>
 
         <br>
 
         <section id="controlsSection" style="width: 600px">
             <fieldset>
-                <button id="stepBtn">Step</button>
-                <button id="backBtn">Back</button>
+                <button id="stepButton">Step</button>
+                <button id="backButton">Back</button>
                 <p>Current State: <span id="stateDisplay"></span></p>
                 <p>Current Head Position: <span id="headDisplay"></span></p>
             </fieldset>

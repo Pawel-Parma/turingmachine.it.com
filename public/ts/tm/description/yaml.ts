@@ -8,6 +8,8 @@ import { Column, Description } from "./description.js"
 const validMoves = [Move.Left, Move.Right, Move.None]
 
 // TODO: implement yaml
+// add format definition to action, format SYMBOL: MOVE, SYMBOL: { WRITE, MOVE, NEXTSTATE }, 
+// SYMBOL: { write: WRITE, move: MOVE, nextState: NEXTSTATE }, 
 export function descriptionFromYaml(yaml: any): Result<Description> {
     const startState = String(yaml.startState) as State
     const blank = String(yaml.blank) as Symbol
@@ -66,5 +68,7 @@ export function descriptionFromYaml(yaml: any): Result<Description> {
 
     return Result.ok(new Description(table, startState, blank))
 }
+
+
 
 

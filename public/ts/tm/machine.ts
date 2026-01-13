@@ -36,7 +36,6 @@ export class Machine {
         }
 
         const action = this.getAction()
-        console.log(action)
         if (action === null || action.isEndAction()) {
             this.halted = true
             return
