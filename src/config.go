@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Port int `json:"port"`
 	Log  struct {
+		File      string `json:"file"`
 		Level     string `json:"level"`
 		Format    string `json:"format"`
 		AddSource bool   `json:"add_source"`

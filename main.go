@@ -1,14 +1,15 @@
 package main
 
 import (
-	. "turingmachine/src"
+	"turingmachine/src"
 )
 
 func main() {
-	config := NewConfig()
-	InitLogger(config)
+	config := src.NewConfig()
+	src.InitLogger(config)
+	defer src.DeinitLogger()
 
-	server := NewServer(config)
+	server := src.NewServer(config)
 
 	server.Start()
 }

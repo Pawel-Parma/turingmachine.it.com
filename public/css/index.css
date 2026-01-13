@@ -1,0 +1,9 @@
+body {
+    font-family: sans-serif;
+}
+
+.tape-cell {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+}

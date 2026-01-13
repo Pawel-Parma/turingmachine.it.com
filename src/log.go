@@ -1,15 +1,22 @@
 package src
 
 import (
+	"io"
 	"log"
 	"log/slog"
 	"os"
 )
 
 var Log *slog.Logger
+var logFile *os.File
 
-// TODO: add logging to a file
 func InitLogger(config *Config) {
+	logFile, err := os.OpenFile(config.Log.File, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("failed to open log file %s: %v", config.Log.File, err)
+	}
+	output := io.MultiWriter(logFile, os.Stdout)
+
 	var level slog.Level
 	switch config.Log.Level {
 	case "debug":
@@ -27,14 +34,14 @@ func InitLogger(config *Config) {
 	var handler slog.Handler
 	switch config.Log.Format {
 	case "pretty":
-		handler = NewPrettyHandler(os.Stdout, level, config.Log.AddSource)
+		handler = NewPrettyHandler(output, level, config.Log.AddSource)
 	case "json":
-		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		handler = slog.NewJSONHandler(output, &slog.HandlerOptions{
 			Level:     level,
 			AddSource: config.Log.AddSource,
 		})
 	case "text":
-		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		handler = slog.NewTextHandler(output, &slog.HandlerOptions{
 			Level:     level,
 			AddSource: config.Log.AddSource,
 		})
@@ -44,4 +51,10 @@ func InitLogger(config *Config) {
 
 	Log = slog.New(handler)
 	slog.SetDefault(Log)
+}
+
+func DeinitLogger() {
+	if logFile != nil {
+		logFile.Close()
+	}
 }

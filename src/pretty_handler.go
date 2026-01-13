@@ -16,7 +16,7 @@ type PrettyHandler struct {
 	out   io.Writer
 	level slog.Level
 	attrs []slog.Attr
-	// TODO: write groups
+	// write groups are not handled currently
 	groups    []string
 	addSource bool
 }
@@ -77,9 +77,10 @@ func (h *PrettyHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 }
 
 func (h *PrettyHandler) WithGroup(name string) slog.Handler {
-	cp := *h
-	cp.groups = append(cp.groups, name)
-	return &cp
+	panic("WARINGIN: Tried to use WithGroup, high time to implement")
+	// cp := *h
+	// cp.groups = append(cp.groups, name)
+	// return &cp
 }
 
 func writeAttr(sb *strings.Builder, a slog.Attr) bool {

@@ -1,6 +1,7 @@
 {
     "port": 3000,
     "log": {
+        "file": "server.log",
         "level": "debug",
         "format": "pretty",
         "add_source": true

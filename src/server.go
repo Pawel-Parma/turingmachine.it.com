@@ -7,6 +7,8 @@ import (
 	"strconv"
 )
 
+const public = "./public"
+
 type Server struct {
 	mux    *http.ServeMux
 	addres string
@@ -23,10 +25,11 @@ func NewServer(config *Config) *Server {
 }
 
 func (s *Server) routes() {
-	fileServer := http.FileServer(http.Dir("./public"))
+	fileServer := http.FileServer(http.Dir(public))
 
 	s.mux.Handle("/css/", fileServer)
 	s.mux.Handle("/js/", fileServer)
+	s.mux.Handle("/ts/", fileServer)
 
 	s.mux.HandleFunc("/", serveFile("index.html"))
 	s.mux.HandleFunc("/about", serveFile("about.html"))
@@ -44,7 +47,7 @@ func (s *Server) Start() {
 
 func serveFile(name string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join("public", name))
+		http.ServeFile(w, r, filepath.Join(public, name))
 	}
 }
 
