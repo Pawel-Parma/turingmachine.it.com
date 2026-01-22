@@ -1,22 +1,29 @@
-export type Symbol = string
-
+import { Move, TSymbol } from "./action.js"
 
 export class Tape {
-    cells: Symbol[]
-    blank: Symbol
+    cells: TSymbol[]
+    blank: TSymbol
     head: number
-    constructor(input: Symbol[], blank: Symbol) {
-        this.cells = input.slice()
+    constructor(cells: TSymbol[], blank: TSymbol) {
+        this.cells = cells.slice()
         this.blank = blank
         this.head = 0
     }
 
-    read(): Symbol {
+    read(): TSymbol {
         return this.cells[this.head]!
     }
 
-    write(symbol: Symbol) {
+    write(symbol: TSymbol) {
         this.cells[this.head] = symbol
+    }
+
+    move(move: Move) {
+        switch (move) {
+            case Move.Left: this.moveLeft(); break
+            case Move.Right: this.moveRight(); break
+            case Move.None: break
+        }
     }
 
     moveLeft() {

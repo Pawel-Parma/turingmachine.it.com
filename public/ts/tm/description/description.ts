@@ -1,35 +1,27 @@
-import { Symbol } from "../tape.js"
+import { Action, State, TSymbol } from "../action.js"
 import { Result } from "../utils/result.js"
-import { Action, State } from "./action.js"
 
 
-export type Column = Map<Symbol, Action>
-export type TransitionTable = Map<State, Column>
+export const defualtBlank: TSymbol = "_"
 
+export type Row = Map<TSymbol, Action>
+export type TransitionTable = Map<State, Row>
 
 export class Description {
-    table: TransitionTable
-    startState: State
-    blank: Symbol
-
-    constructor(table: TransitionTable, startState: State, blank: Symbol) {
-        this.table = table
-        this.startState = startState
-        this.blank = blank
-    }
+    constructor(
+        public table: TransitionTable,
+        public startState: State,
+        public blank: TSymbol,
+    ) { }
 
     verifyTransitionTable(): Result<void> {
         if (!this.table.has(this.startState)) {
             return Result.err(`Start state '${this.startState}' does not exist`)
         }
 
-        for (const [state, column] of this.table) {
-            for (const [symbol, action] of column) {
-                if (action.nextState == "") {
-                    continue
-                }
-
-                if (!this.table.has(action.nextState)) {
+        for (const [state, row] of this.table) {
+            for (const [symbol, action] of row) {
+                if (action.nextState !== null && !this.table.has(action.nextState)) {
                     return Result.err(`Transition from state: '${state}' on symbol: '${symbol}' points to non-existent state: ${action.nextState}`)
                 }
             }
@@ -42,10 +34,11 @@ export class Description {
         const allStates = new Set<State>(this.table.keys())
 
         const usedStates = new Set<State>()
-        for (const [_, column] of this.table) {
-            for (const [_, action] of column) {
-                usedStates.add(action.nextState)
-
+        for (const [_, row] of this.table) {
+            for (const [_, action] of row) {
+                if (action.nextState !== null) {
+                    usedStates.add(action.nextState)
+                }
             }
         }
 

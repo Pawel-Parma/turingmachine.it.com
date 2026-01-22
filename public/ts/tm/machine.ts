@@ -1,13 +1,13 @@
-import { Action, Move, State } from "./description/action.js"
+import { Action, State, TSymbol } from "./action.js"
 import { Description } from "./description/description.js"
-import { Symbol, Tape } from "./tape.js"
+import { Tape } from "./tape.js"
 import { assert } from "./utils/assert.js"
-import { bool, Optional } from "./utils/utils.js"
+import { bool, Optional } from "./utils/types.js"
 
 type HistoryEntry = {
-    state: State
-    head: number
-    write: Optional<Symbol>
+    previousState: State
+    previousHead: number
+    previousSymbol: TSymbol
 }
 
 export class Machine {
@@ -16,17 +16,17 @@ export class Machine {
     tape: Tape
     halted: bool
     history: HistoryEntry[]
-    constructor(description: Description, input: Symbol[]) {
+    constructor(description: Description) {
         this.description = description
         this.state = description.startState
-        this.tape = new Tape(input, this.description.blank)
-        this.halted = false
+        this.tape = new Tape([], this.description.blank)
+        this.halted = true
         this.history = []
     }
 
-    changeInput(input: Symbol[]) {
+    loadTape(cells: TSymbol[]) {
         this.state = this.description.startState
-        this.tape = new Tape(input, this.description.blank)
+        this.tape = new Tape(cells, this.description.blank)
         this.halted = false
     }
 
@@ -36,57 +36,45 @@ export class Machine {
         }
 
         const action = this.getAction()
-        if (action === null || action.isEndAction()) {
+        if (action === null || action.isHalt()) {
             this.halted = true
             return
         }
 
-        const diff: HistoryEntry = {
-            state: this.state,
-            head: this.tape.head,
-            write: this.tape.read(),
-        }
-        this.history.push(diff)
+        this.history.push({
+            previousState: this.state,
+            previousHead: this.tape.head,
+            previousSymbol: this.tape.read(),
+        })
 
         if (action.write !== null) {
             this.tape.write(action.write)
         }
 
-        switch (action.move) {
-            case Move.Left: this.tape.moveLeft(); break
-            case Move.Right: this.tape.moveRight(); break
-            case Move.None: break
-        }
+        this.tape.move(action.move)
 
-        if (action.nextState !== "") {
-            this.state = action.nextState
-        }
+        this.state = action.nextState ?? this.state
     }
 
     back() {
         const last = this.history.pop()
         if (!last) return
 
-        this.state = last.state
-        this.tape.head = last.head
-        if (last.write !== null) {
-            this.tape.write(last.write)
-        }
+        this.state = last.previousState
+        this.tape.head = last.previousHead
+        this.tape.write(last.previousSymbol)
 
         this.halted = false
     }
 
     getAction(): Optional<Action> {
-        const column = this.description.table.get(this.state)
-        assert(column !== undefined)
+        const row = this.description.table.get(this.state)
+        assert(row !== undefined, "row cannot be undefined")
 
         const symbol = this.tape.read()
-        const action = column.get(symbol)
-        if (action === undefined) {
-            return null
-        }
+        const action = row.get(symbol)
 
-        return action
+        return action ?? null
     }
 }
 

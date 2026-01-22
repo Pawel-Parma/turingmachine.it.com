@@ -3,44 +3,90 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Turing Machine Simulator</title>
-    <link rel="stylesheet" href="./css/index.css" defer>
+    <link rel="stylesheet" href="./css/index.css">
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js" defer></script>
     <script type="module" src="./js/main.js" defer></script>
 </head>
 
 <body>
-    <header>
-        <h1>Turing Machine Simulator</h1>
-    </header>
+    <!--  TODO: understand what happens here -->
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <h1>Turing Machine <span>Simulator</span></h1>
+            </div>
+        </header>
 
-    <main>
-        <section id="descriptionSection">
-            <textarea id="yamlInput" style="height: 250px; width: 600px;"></textarea>
-            <button id="loadYamlButton">Load YAML</button>
-        </section>
+        <main>
+            <div class="grid-layout">
+                <section class="execution-panel">
+                    <div class="card viz-card">
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="label">State</span>
+                                <span id="stateDisplay" class="value">---</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="label">Head</span>
+                                <span id="headDisplay" class="value">0</span>
+                            </div>
+                        </div>
 
-        <section id="tapeSection">
-            <input id="tapeInput" type="text">
-            <button id="loadTapeButton">Load Tape</button>
-        </section>
+                        <div class="tape-viewport">
+                            <div class="head-pointer">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 21L12 3M12 21L7 16M12 21L17 16" stroke="currentColor" stroke-width="3"
+                                        fill="none" />
+                                </svg>
+                            </div>
+                            <div id="tapeDisplay" class="tape-track">
+                                <!-- Cells will be injected here -->
+                            </div>
+                        </div>
+                    </div>
 
-        <br>
+                    <div class="controls">
+                        <button id="backButton" class="btn-secondary">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+                            </svg>
+                            Step Back
+                        </button>
+                        <button id="stepButton" class="btn-action">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                            </svg>
+                            Next Step
+                        </button>
+                    </div>
+                </section>
 
-        <section id="controlsSection" style="width: 600px">
-            <fieldset>
-                <button id="stepButton">Step</button>
-                <button id="backButton">Back</button>
-                <p>Current State: <span id="stateDisplay"></span></p>
-                <p>Current Head Position: <span id="headDisplay"></span></p>
-            </fieldset>
-        </section>
 
-        <section id="tapeDisplaySection" style="width: 600px">
-            <h2>Tape</h2>
-            <pre id="tapeDisplay"></pre>
-        </section>
-    </main>
+                <section class="config-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <label for="yamlInput">Machine Definition (YAML)</label>
+                        </div>
+                        <textarea id="yamlInput" spellcheck="false" placeholder="Enter YAML description..."></textarea>
+                        <button id="loadYamlButton" class="btn-primary">Initialize Machine</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <label for="tapeInput">Initial Tape</label>
+                        </div>
+                        <div class="input-group">
+                            <input id="tapeInput" type="text" placeholder="e.g. 1 0 1 1">
+                            <button id="loadTapeButton">Load</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
 </body>
 
 </html>

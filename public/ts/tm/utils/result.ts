@@ -1,24 +1,24 @@
 import { assert } from "./assert.js"
-import { bool, Optional } from "./utils.js"
+import { bool, Optional } from "./types.js"
 
 
 export class Result<T = void> {
     value: Optional<T>
     error: Optional<Error>
-    constructor(value?: T, error?: Error) {
-        this.value = value ?? null
-        this.error = error ?? null
+    constructor(value: Optional<T>, error: Optional<Error>) {
+        this.value = value
+        this.error = error
     }
 
     static ok(): Result<void>
-    static ok<T>(value?: T): Result<T>
+    static ok<T>(value: T): Result<T>
     static ok<T>(value?: T): Result<T> {
-        return new Result(value)
+        return new Result(value ?? null, null)
     }
 
     static err<T>(error: string | Error): Result<T> {
         const err = typeof error === "string" ? new Error(error) : error
-        return new Result<T>(undefined, err)
+        return new Result<T>(null, err)
     }
 
     isOk(): bool { return !this.error }
@@ -32,12 +32,14 @@ export class Result<T = void> {
         return this.error!
     }
 
-    unwrapOr(value: T): T {
-        return this.value ?? value
+    addMsg(message: string, separator: string = ":"): Result<T> {
+        assert(this.isErr(), "cannot add message to a result without an error")
+        this.error = new Error(`${this.error!.message}${separator} ${message}`)
+        return this
     }
 
     cast<U>(): Result<U> {
-        assert(this.isErr(), "cannot cast result with a value to a different error type")
+        assert(this.isErr(), "cannot cast result without an error to a different error type")
         return Result.err<U>(this.error!)
     }
 }

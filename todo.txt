@@ -1,0 +1,25 @@
+TODO:
+    - make ui for the turing machine:
+        - input with keyboard shortcuts
+        - theme
+        - github link
+        - auto step with speed
+    - is move and write two different micro steps a better choic?
+    - refactor machine.ts
+    - default blank character, meaby _?
+    - show the transition table in ui
+    - show table and flow graph
+    - make /about
+    - give thorought explanation in / about synax and more
+    - examples
+    - files
+    - shareing machines
+    - better error messages and reporing
+    - add unpacking, eg turn[a, b, c]: R into a: R, b: R, c: R
+    - show unreferene states
+
+
+IDEAS:
+    - 2D turing machine
+    - 3D turing mahcine
+    - get an ordering and autoformat

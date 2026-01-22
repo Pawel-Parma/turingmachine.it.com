@@ -1,4 +1,4 @@
 declare const jsyaml: {
-    load(yaml: string): any;
+    load(yaml: string): any
 };
 
