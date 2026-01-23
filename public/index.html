@@ -4,22 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Turing Machine Simulator</title>
-    <link rel="stylesheet" href="./css/index.css">
-    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js" defer></script>
+    <meta name="description"
+        content="Interactive Turing Machine simulator for visualizing states, tape movement, and execution step by step using YAML definitions.">
+    <link rel="canonical" href="https://turingmachine.it.com/">
+
+    <meta name="robots" content="index, follow">
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="./css/index.css" defer>
     <script type="module" src="./js/main.js" defer></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js" defer></script>
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" -->
+    <!--     defer> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script> -->
 </head>
 
 <body>
-    <!--  TODO: understand what happens here -->
     <div class="app-container">
         <header>
             <div class="header-content">
-                <h1>Turing Machine <span>Simulator</span></h1>
+                <div class="header-left">
+                    <img src="favicon.svg" alt="Turing Machine Logo" style="width: 70px; height: 70px;">
+                    <h1>Turing Machine <span>Simulator</span></h1>
+                </div>
+
+                <a href="https://github.com/Pawel-Parma/turingmachine.it.com" target="_blank" rel="noopener noreferrer"
+                    class="github-link" title="View on GitHub" , style="align-items: right;">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub"
+                        style="width: 60px; height: 60px; filter: brightness(0);">
+                </a>
             </div>
         </header>
 
         <main>
+            <!--  TODO: understand what happens here -->
             <div class="grid-layout">
                 <section class="execution-panel">
                     <div class="card viz-card">
@@ -35,12 +58,6 @@
                         </div>
 
                         <div class="tape-viewport">
-                            <div class="head-pointer">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M12 21L12 3M12 21L7 16M12 21L17 16" stroke="currentColor" stroke-width="3"
-                                        fill="none" />
-                                </svg>
-                            </div>
                             <div id="tapeDisplay" class="tape-track">
                                 <!-- Cells will be injected here -->
                             </div>
@@ -49,12 +66,14 @@
 
                     <div class="controls">
                         <button id="backButton" class="btn-secondary">
+                            <!-- TODO: get icon -->
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
                             </svg>
                             Step Back
                         </button>
                         <button id="stepButton" class="btn-action">
+                            <!-- TODO: get icon  -->
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                             </svg>
@@ -63,13 +82,16 @@
                     </div>
                 </section>
 
-
                 <section class="config-panel">
                     <div class="card">
                         <div class="card-header">
                             <label for="yamlInput">Machine Definition (YAML)</label>
                         </div>
-                        <textarea id="yamlInput" spellcheck="false" placeholder="Enter YAML description..."></textarea>
+                        <!-- <div class="code-editor-container"> -->
+                        <!--     <pre id="highlighting" aria-hidden="true"><code class="language-yaml" -->
+                        <!--             id="highlighting-content"></code></pre> -->
+                        <textarea id="yamlInput" spellcheck="false"></textarea>
+                        <!-- </div> -->
                         <button id="loadYamlButton" class="btn-primary">Initialize Machine</button>
                     </div>
 
@@ -78,13 +100,12 @@
                             <label for="tapeInput">Initial Tape</label>
                         </div>
                         <div class="input-group">
-                            <input id="tapeInput" type="text" placeholder="e.g. 1 0 1 1">
+                            <input id="tapeInput" type="text">
                             <button id="loadTapeButton">Load</button>
                         </div>
                     </div>
                 </section>
             </div>
-
         </main>
     </div>
 </body>

@@ -1,7 +1,7 @@
 /*  TODO: understand what happens here */
 
 :root {
-    --primary: #3b82f6;
+    --primary: #347bf0;
     --primary-dark: #2563eb;
     --bg: #f1f5f9;
     --card-bg: rgba(255, 255, 255, 0.9);
@@ -20,50 +20,59 @@ body {
 }
 
 .app-container {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
 }
 
-header {
-    margin-bottom: 2rem;
-}
-
 .header-content {
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    padding-bottom: 2rem;
+    padding: 1rem 2rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.github-link {
+    display: flex;
     align-items: center;
 }
 
 h1 {
-    font-size: 1.875rem;
+    font-size: 2.5rem;
     font-weight: 800;
     margin: 0;
 }
 
 h1 span {
-    color: var(--primary);
-}
-
-.badge {
-    background: #e2e8f0;
-    padding: 0.25rem 1rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
+    color: var(--primary-dark);
 }
 
 .grid-layout {
     display: grid;
-    grid-template-columns: 400px 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+    align-items: start;
 }
 
-@media (max-width: 900px) {
-    .grid-layout {
-        grid-template-columns: 1fr;
-    }
+#yamlInput {
+    width: 100%;
+    min-height: 300px;
+    /* Set a reasonable height */
+    resize: vertical;
+    /* Only allow user to resize height, not width */
+    box-sizing: border-box;
+}
+
+.execution-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .card {
@@ -127,7 +136,7 @@ button {
 }
 
 .btn-action {
-    background: var(--primary);
+    background: var(--primary-dark);
     color: white;
     border: none;
     display: flex;
@@ -186,13 +195,35 @@ button {
     border-top: 1px solid var(--border);
 }
 
-.head-pointer {
-    position: absolute;
-    top: 0.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 24px;
-    color: var(--primary);
+.tape-viewport {
+    width: 100%;
+    /* Occupy full width of the card */
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    overflow-y: hidden;
+    /* Hide vertical scroll if not needed */
+    position: relative;
+    /* Keeps the head-pointer positioned correctly */
+    background: #f8f9fa;
+    /* Optional: different color to see the track area */
+    border-radius: 8px;
+    padding: 20px 0;
+    /* Space for the head pointer */
+}
+
+.tape-track {
+    display: flex;
+    /* Keep cells in a line */
+    transition: transform 0.3s ease;
+    /* Smooth sliding animation */
+    width: max-content;
+    /* Crucial: allows it to be wider than the viewport */
+    min-width: 100%;
+    /* Fills the viewport even if empty */
+    gap: 4px;
+    /* Space between cells */
+    padding: 0 50%;
+    /* Allows the tape to center even at the ends */
 }
 
 .tape-track {
@@ -219,7 +250,7 @@ button {
 }
 
 .tape-cell.active {
-    border-color: var(--primary);
+    border-color: var(--primary-dark);
     background: #eff6ff;
     transform: translateY(-8px);
     box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);

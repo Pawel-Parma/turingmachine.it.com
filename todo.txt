@@ -14,6 +14,7 @@ TODO:
 
     - BACKEND:
         - count the amount of visits, or unique visits and display
+        - minify js
 
 IDEAS:
     - non deterministic turing machine
