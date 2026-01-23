@@ -27,9 +27,10 @@ func NewServer(config *Config) *Server {
 func (s *Server) routes() {
 	fileServer := http.FileServer(http.Dir(public))
 
-	s.mux.Handle("/css/", fileServer)
 	s.mux.Handle("/js/", fileServer)
 	s.mux.Handle("/ts/", fileServer)
+	s.mux.Handle("/css/", fileServer)
+	s.mux.Handle("/icons/", fileServer)
 
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
