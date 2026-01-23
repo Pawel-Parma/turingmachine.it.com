@@ -31,8 +31,16 @@ func (s *Server) routes() {
 	s.mux.Handle("/js/", fileServer)
 	s.mux.Handle("/ts/", fileServer)
 
-	s.mux.HandleFunc("/", serveFile("index.html"))
+	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			serveFileNoCache("index.html")(w, r)
+		} else {
+			http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+		}
+	})
+
 	s.mux.HandleFunc("/about", serveFile("about.html"))
+	s.mux.HandleFunc("/about.html", redirect("/about"))
 
 	s.mux.HandleFunc("/api/status", s.apiStatus)
 }
@@ -46,6 +54,18 @@ func (s *Server) Start() {
 }
 
 func serveFile(name string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(public, name))
+	}
+}
+
+func redirect(dest string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, dest, http.StatusPermanentRedirect)
+	}
+}
+
+func serveFileNoCache(name string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(public, name))
 	}

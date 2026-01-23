@@ -1,21 +1,26 @@
 import { Action, Move, State, TSymbol, validMoves, validMovesInfo } from "../action.js"
 import { assert } from "../utils/assert.js"
 import { Result } from "../utils/result.js"
-import { Optional } from "../utils/types.js"
-import { Description, Row, defualtBlank } from "./description.js"
+import { Description, Row, defaultBlank, defaultInputSeparator } from "./description.js"
 
 export function descriptionFromYaml(rawYaml: string): Result<Description> {
-    const yaml: any = jsyaml.load(rawYaml)
+    const expandedYaml = expandYamlArrayKeys(rawYaml)
+    if (expandedYaml.isErr()) return expandedYaml.cast()
+    const yaml: any = jsyaml.load(expandedYaml.getValue())
     if (yaml == null) {
         return Result.err("No input provided")
     }
-    const blank = String(yaml.blank ?? defualtBlank)
 
-    if (yaml.startState === null || yaml.startState === undefined) {
-        return Result.err("startState has to have a value")
+    if (yaml.startState == null && yaml["start state"] == null) {
+        return Result.err("'startState' has to have a value")
     }
-    // TODO: support also "start state"
-    const startState = String(yaml.startState)
+    if (yaml.startState != null && yaml["start state"] != null && yaml.startState != yaml["start state"]) {
+        return Result.err("'startState' and 'start state' have different values")
+    }
+    const startState = String(yaml.startState == null ? yaml["start state"] : yaml.startState)
+
+    const blank = String(yaml.blank ?? defaultBlank)
+    const inputSeparator = String(yaml.inputSeparator ?? defaultInputSeparator)
 
     const table = new Map<State, Row>()
     for (const state in yaml.table) {
@@ -52,8 +57,36 @@ export function descriptionFromYaml(rawYaml: string): Result<Description> {
         }
     }
 
-    return Result.ok(new Description(table, startState, blank))
+    return Result.ok(new Description(table, startState, blank, inputSeparator))
 }
+
+function expandYamlArrayKeys(rawYaml: string): Result<string> {
+    const lines = rawYaml.split("\n")
+    const output: string[] = []
+
+    for (let line of lines) {
+        const arrayKeyMatch = line.match(/^(\s*)\[(.*)\]\s*:(.*)$/)
+        if (!arrayKeyMatch) {
+            output.push(line)
+            continue
+        }
+
+        const indent = arrayKeyMatch[1] ?? ""
+        const rawKeys = arrayKeyMatch[2]!.trim()
+        const value = arrayKeyMatch[3]!.trim()
+
+        const keys = rawKeys.split(",")
+        for (const key of keys) {
+            if (key === "") {
+                return Result.err("Encountered multiple ',' in a row. If ',' is part of a symbol, quote it")
+            }
+            output.push(`${indent}${key.trim()}: ${value}`)
+        }
+    }
+
+    return Result.ok(output.join("\n"))
+}
+
 
 function parseMove(raw: any, locMsg: string): Result<Move> {
     if (!validMoves.includes(raw)) {
@@ -78,24 +111,32 @@ function parseArray(raw: any[], locMsg: string): Result<Action> {
         return parseSingle(raw[0], locMsg)
     }
 
-    // TODO: infer whether [ write, move ] or [ move, nextState ]
-    // via parsing both as move and when 
-    //   both succed return ambiguity error (nextState can also be named L, R, N) if len == 2
-    //   none succed return no move error
-    //   left succeds and right not assume [ move, nextState ] and error if len == 3 bc then right must succed
-    //   right succeds and left not assume [ write, move ] and continue with what logic is now
-    const write = raw[0] == null ? null : String(raw[0])
-    const res = parseMove(raw[1], locMsg)
-    if (res.isErr()) return res.cast()
-    const move = res.getValue()
+    const r0m = parseMove(raw[0], locMsg)
+    const r1m = parseMove(raw[1], locMsg)
 
-
-    var nextState: Optional<State> = null
-    if (raw.length === 3) {
-        nextState = raw[2] == null ? null : String(raw[2])
+    if (r0m.isOk() && r1m.isOk() && raw.length === 2) {
+        return Result.err(`Cannot infer array format [ write, move ] or [ move, nextState ] in ${raw} ${locMsg}`)
     }
 
-    return Result.ok(new Action(write, move, nextState))
+    if (r0m.isErr() && r1m.isErr()) {
+        return Result.err(`No valid move found in array ${raw} ${locMsg}`)
+    }
+
+    if (r0m.isErr() && r1m.isOk() || raw.length === 3) {
+        const write = raw[0] == null ? null : String(raw[0])
+        if (r1m.isErr()) return r1m.cast()
+        const move = r1m.getValue()
+        const nextState = raw.length !== 3 || raw[2] == null ? null : String(raw[2])
+        return Result.ok(new Action(write, move, nextState))
+    }
+
+    if (r0m.isOk() && r1m.isErr()) {
+        const move = r0m.getValue()
+        const nextState = raw[1] == null ? null : String(raw[1])
+        return Result.ok(new Action(null, move, nextState))
+    }
+
+    return Result.err(`Unable to parse array action ${raw} ${locMsg}`)
 }
 
 
@@ -124,3 +165,4 @@ function parseLegacy(raw: any, locMsg: string): Result<Action> {
 
     return Result.ok(new Action(write, move, nextState))
 }
+

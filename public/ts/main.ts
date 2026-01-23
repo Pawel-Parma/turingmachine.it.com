@@ -1,8 +1,9 @@
 import { descriptionFromYaml } from "./tm/description/yaml.js"
 import { Machine } from "./tm/machine.js"
+import { Optional } from "./tm/utils/types.js"
 
 
-let machine: Machine | undefined
+let gMachine: Optional<Machine> = null
 
 
 function onClick(id: string, handler: () => void) {
@@ -10,81 +11,96 @@ function onClick(id: string, handler: () => void) {
 }
 
 
-window.addEventListener("load", () => {
-    newMachine()
-    updateDisplay()
-})
+window.addEventListener("load", loadMachine)
 
-
-onClick("loadYamlButton", () => {
-    newMachine()
-    updateDisplay()
-})
+onClick("loadYamlButton", loadMachine)
 
 onClick("loadTapeButton", () => {
-    if (!machine) return
-    machine.loadTape(getInput())
-    updateDisplay()
+    if (!gMachine) {
+        reportError("Load machine first")
+        return
+    }
+    gMachine.loadTape(readInput(gMachine.description.inputSeparator))
+    updateDisplay(gMachine)
 })
 
 onClick("stepButton", () => {
-    if (!machine) return
-    machine.step()
-    updateDisplay()
+    if (!gMachine) {
+        reportError("Load machine first")
+        return
+    }
+    gMachine.step()
+    updateDisplay(gMachine)
 })
 
 onClick("backButton", () => {
-    if (!machine) return
-    machine.back()
-    updateDisplay()
+    if (!gMachine) {
+        reportError("Load machine first")
+        return
+    }
+    gMachine.back()
+    updateDisplay(gMachine)
 })
 
+function reportError(error: any) {
+    console.log(error)
+}
 
 function readYaml(): string {
     const yamlInput = document.getElementById("yamlInput") as HTMLTextAreaElement
     return yamlInput.value
 }
 
-function getInput(): string[] {
+function readInput(separator: string): string[] {
     const tapeInput = document.getElementById("tapeInput") as HTMLInputElement
-    return tapeInput.value.split("")
+    return tapeInput.value.split(separator)
 }
 
-function newMachine() {
+function loadMachine() {
+    if (readYaml() == "") {
+        return
+    }
+
+    gMachine = newMachine()
+    if (gMachine === null) {
+        return
+    }
+
+    gMachine.loadTape(readInput(gMachine.description.inputSeparator))
+    updateDisplay(gMachine)
+}
+
+function newMachine(): Optional<Machine> {
     const rawYaml = readYaml()
     var descriptionResult = descriptionFromYaml(rawYaml)
     if (descriptionResult.isErr()) {
-        console.log(descriptionResult.error)
-        return
+        reportError(descriptionResult.getError())
+        return null
     }
     const description = descriptionResult.getValue()
 
     var verifyResult = description.verifyTransitionTable()
     if (verifyResult.isErr()) {
-        console.log(verifyResult.error)
-        return
+        reportError(verifyResult.getError())
+        return null
     }
 
-    machine = new Machine(description)
-    machine.loadTape(getInput())
+    return new Machine(description)
+}
+
+function updateDisplay(machine: Machine) {
+    updateCellsDisplay(machine)
+    updateIndicatorsDisplay(machine)
 }
 
 // TODO: refactor
-function updateDisplay() {
-    if (!machine) return
-
+function updateCellsDisplay(machine: Machine) {
     const tapeDiv = document.getElementById("tapeDisplay")!
-    const stateDiv = document.getElementById("stateDisplay")!
-    const headDiv = document.getElementById("headDisplay")!
-
-    // Create graphical cells
     tapeDiv.innerHTML = ""
-    // Show a window of cells around the head for better visibility
-    const displayCells = machine.tape.cells
-    const maxIdx = Math.max(displayCells.length - 1, machine.tape.head + 5)
 
-    for (let i = 0; i <= maxIdx; i++) {
-        const cellVal = displayCells[i] || "_"
+    for (let i = 0; i <= machine.tape.cells.length; i++) {
+        const cellVal = machine.tape.cells[i]
+        if (cellVal == null) { console.log("AA"); return }
         const cellEl = document.createElement("div")
         cellEl.className = `tape-cell ${i === machine.tape.head ? 'active' : ''}`
         cellEl.textContent = cellVal
@@ -95,8 +111,12 @@ function updateDisplay() {
             cellEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
         }
     }
-
-    stateDiv.textContent = machine.state
-    headDiv.textContent = String(machine.tape.head)
 }
 
+function updateIndicatorsDisplay(machine: Machine) {
+    const stateDiv = document.getElementById("stateDisplay")!
+    stateDiv.textContent = machine.state
+
+    const headDiv = document.getElementById("headDisplay")!
+    headDiv.textContent = String(machine.tape.head)
+}
