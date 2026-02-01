@@ -8,7 +8,8 @@ import (
 )
 
 type Config struct {
-	Port int `json:"port"`
+	Port int    `json:"port"`
+	Ip   string `json:"ip"`
 	Log  struct {
 		File      string `json:"file"`
 		Level     string `json:"level"`

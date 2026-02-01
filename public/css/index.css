@@ -1,56 +1,172 @@
-/*  TODO: understand what happens here */
-
 :root {
-    --primary: #347bf0;
-    --primary-dark: #2563eb;
-    --bg: #f1f5f9;
-    --card-bg: rgba(255, 255, 255, 0.9);
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --mono: 'JetBrains Mono', 'Courier New', monospace;
+    --primary: #6366f1;
+    --primary-dark: #4338ca;
+    --complementary: #19e6a1;
+
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --textarea-bg: #0f172a;
+    --button-primary-bg: #12ce90;
+    --button-action-bg: #6366f1;
+    --button-secondary-bg: #334155;
+    --tape-viewport-bg: #020617;
+    --tape-cell-bg: #334155;
+    --tape-cell-active-bg: #6366f1;
+
+    --main-text: #f1f5f9;
+    --muted-text: #94a3b8;
+    --textarea-text: #818cf8;
+    --button-primary-text: #ffffff;
+    --button-action-text: #ffffff;
+    --button-secondary-text: #e2e8f0;
+
+    --border: #475569;
+    --tape-cell-active-border: #818cf8;
+
+    --card-shadow: rgba(0, 0, 0, 0.4);
+    --tape-cell-active-shadow: rgba(99, 102, 241, 0.4);
+
+    --font: "JetBrains Mono", monospace;
 }
 
 body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg);
-    color: var(--text-main);
-    line-height: 1.5;
-}
-
-.app-container {
     margin: 0 auto;
-    padding: 1rem;
+    padding: 0.63rem;
+    color: var(--main-text);
+    font-family: var(--font);
+    line-height: 1.5;
+    background-color: var(--bg);
 }
 
-.header-content {
+/* Misc */
+
+.hidden {
+    display: none !important;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--card-bg);
+    box-shadow: 0 4px 6px -1px var(--card-shadow);
+}
+
+.card-header {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted-text);
+}
+
+button {
     display: flex;
+    flex-direction: column;
     align-items: center;
+
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border: none;
+    border-radius: 0.5rem;
+
+    font-family: var(--font);
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+button:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+}
+
+button.glow:hover {
+    transform: none;
+    filter: none;
+    box-shadow: 0 0 12px 1px var(--button-primary-bg);
+}
+
+button.glow:active {
+    transform: none;
+    filter: brightness(0.95);
+}
+
+button.primary {
+    /* TODO: remove width: 100%; (is nessecary for Initialize Machine) */
+    width: 100%;
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+}
+
+button.action {
+    background: var(--button-action-bg);
+    color: var(--button-action-text);
+}
+
+button.secondary {
+    background: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+}
+
+/* Header */
+
+.header {
+    display: flex;
     justify-content: space-between;
+    align-items: center;
     padding-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 .header-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+}
+
+.header-left h1 {
+    margin: 0;
+    margin-left: -2px;
+    margin-bottom: -8px;
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.header-left h1 span {
+    color: var(--complementary);
+    filter: drop-shadow(0 0 20px var(--complementary));
+}
+
+.logo {
+    transition: all 0.8s ease-in-out;
+    transform: scale(1.00);
+}
+
+.logo:hover {
+    transition: all 0.2s ease-out;
+    filter: drop-shadow(0 0 20px var(--primary-dark));
+    transform: scale(1.05);
 }
 
 .github-link {
     display: flex;
     align-items: center;
+    transition: filter 0.6s ease-in-out;
 }
 
-h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 0;
+.github-link:hover {
+    transition: filter 0.2s ease-out;
+    filter: drop-shadow(0 0 10px var(--primary));
 }
 
-h1 span {
-    color: var(--primary-dark);
-}
+/* Grid */
 
 .grid-layout {
     display: grid;
@@ -59,50 +175,139 @@ h1 span {
     align-items: start;
 }
 
-#yamlInput {
-    width: 100%;
-    min-height: 300px;
-    /* Set a reasonable height */
-    resize: vertical;
-    /* Only allow user to resize height, not width */
-    box-sizing: border-box;
+.grid-layout>* {
+    min-width: 0;
 }
+
+/* TODO: understand what happens here */
+/* TODO:*/
 
 .execution-panel {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
 }
 
-.card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    margin-bottom: 1.5rem;
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
 }
 
-.card-header {
+.stats .item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stats .item .label {
     font-size: 0.75rem;
+    color: var(--muted-text);
+    font-weight: 600;
+}
+
+.stats .item .value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: var(--font);
+}
+
+.tape-viewport {
+    padding: 20px 0;
+    position: relative;
+    width: 100%;
+    /* Ensure this is strictly capped */
+    overflow: hidden;
+    /* This keeps the 'container' from growing */
+    border-radius: 8px;
+    background: var(--tape-viewport-bg);
+}
+
+.tape-track {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    /* Force items to stay on one line */
+    gap: 4px;
+    padding: 1rem;
+
+    /* THE FIXES */
+    overflow-x: auto;
+    /* Allow the track itself to scroll */
+    width: 100%;
+    /* Match the parent width */
+    box-sizing: border-box;
+}
+
+.tape-track {
+    /* ... your existing styles ... */
+
+    /* 1. For Firefox */
+    scrollbar-width: none;
+
+    /* 2. For Internet Explorer and Edge */
+    -ms-overflow-style: none;
+}
+
+/* 3. For Chrome, Safari, and newer Edge */
+.tape-track::-webkit-scrollbar {
+    display: none;
+}
+
+
+.tape-cell {
+    min-width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tape-cell-bg);
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    font-family: var(--font);
     font-weight: 700;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tape-cell.active {
+    border-color: var(--tape-cell-active-border);
+    background: var(--tape-cell-active-bg);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 15px -3px var(--tape-cell-active-shadow);
+}
+
+/* TODO:*/
+
+.controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 1rem;
+}
+
+
+/* TODO:*/
+
+#yamlInput {
+    width: 100%;
+    min-height: 300px;
+    /* Set a reasonable height */
+    resize: none;
+    /* Only allow user to resize height, not width */
+    box-sizing: border-box;
 }
 
 textarea {
     width: 100%;
     height: 300px;
-    background: #0f172a;
-    color: #cbd5e1;
+    background: var(--textarea-bg);
+    color: var(--textarea-text);
     border-radius: 0.5rem;
     padding: 1rem;
-    font-family: var(--mono);
+    font-family: var(--font);
     font-size: 0.875rem;
     box-sizing: border-box;
     border: none;
-    resize: vertical;
 }
 
 .input-group {
@@ -115,147 +320,24 @@ input[type="text"] {
     padding: 0.625rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
-    font-family: var(--mono);
+    font-family: var(--font);
+    background: var(--textarea-bg);
+    color: var(--textarea-text)
 }
 
-button {
-    cursor: pointer;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: all 0.2s;
-    border: 1px solid var(--border);
-    padding: 0.625rem 1.25rem;
+textarea,
+input[type="text"] {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
-.btn-primary {
-    width: 100%;
-    margin-top: 1rem;
-    background: #1e293b;
-    color: white;
-}
-
-.btn-action {
-    background: var(--primary-dark);
-    color: white;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1.5rem;
-}
-
-.btn-secondary {
-    background: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1.5rem;
-}
-
-.controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.viz-card {
-    position: relative;
-    overflow: hidden;
-}
-
-.stats {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-item .label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.stat-item .value {
-    font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--mono);
-}
-
-.tape-viewport {
-    padding: 3rem 0;
-    position: relative;
-    border-top: 1px solid var(--border);
-}
-
-.tape-viewport {
-    width: 100%;
-    /* Occupy full width of the card */
-    overflow-x: auto;
-    /* Enable horizontal scrolling */
-    overflow-y: hidden;
-    /* Hide vertical scroll if not needed */
-    position: relative;
-    /* Keeps the head-pointer positioned correctly */
-    background: #f8f9fa;
-    /* Optional: different color to see the track area */
-    border-radius: 8px;
-    padding: 20px 0;
-    /* Space for the head pointer */
-}
-
-.tape-track {
-    display: flex;
-    /* Keep cells in a line */
-    transition: transform 0.3s ease;
-    /* Smooth sliding animation */
-    width: max-content;
-    /* Crucial: allows it to be wider than the viewport */
-    min-width: 100%;
-    /* Fills the viewport even if empty */
-    gap: 4px;
-    /* Space between cells */
-    padding: 0 50%;
-    /* Allows the tape to center even at the ends */
-}
-
-.tape-track {
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-    overflow-x: auto;
-    padding: 1rem;
-}
-
-.tape-cell {
-    min-width: 3.5rem;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    border: 2px solid var(--border);
-    border-radius: 0.5rem;
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: 1.25rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tape-cell.active {
-    border-color: var(--primary-dark);
-    background: #eff6ff;
-    transform: translateY(-8px);
-    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
-}
-
-.icon {
-    width: 24px;
-    height: 24px;
+textarea:focus,
+input[type="text"]:focus {
+    outline: none;
+    border: 1px solid var(--textarea-text);
+    /* Uses your existing variable */
+    box-shadow: 0 0 5px 2px var(--primary);
+    /* Soft glow */
 }

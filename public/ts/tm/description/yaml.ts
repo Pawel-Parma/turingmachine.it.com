@@ -1,12 +1,23 @@
 import { Action, Move, State, TSymbol, validMoves, validMovesInfo } from "../action.js"
 import { assert } from "../utils/assert.js"
 import { Result } from "../utils/result.js"
-import { Description, Row, defaultBlank, defaultInputSeparator } from "./description.js"
+import { Description, Row, defaultBlank, defaultInput, defaultInputSeparator } from "./description.js"
 
 export function descriptionFromYaml(rawYaml: string): Result<Description> {
     const expandedYaml = expandYamlArrayKeys(rawYaml)
     if (expandedYaml.isErr()) return expandedYaml.cast()
-    const yaml: any = jsyaml.load(expandedYaml.getValue())
+    var yaml: any = null
+    try {
+        yaml = jsyaml.load(expandedYaml.getValue())
+    } catch (e) {
+        var error: any = e
+        if (e instanceof Error) {
+            error = e.message
+        }
+
+        return Result.err("Invalid yaml").addMsg(error).cast()
+    }
+
     if (yaml == null) {
         return Result.err("No input provided")
     }
@@ -21,6 +32,7 @@ export function descriptionFromYaml(rawYaml: string): Result<Description> {
 
     const blank = String(yaml.blank ?? defaultBlank)
     const inputSeparator = String(yaml.inputSeparator ?? defaultInputSeparator)
+    const input: string = String(yaml.input ?? defaultInput)
 
     const table = new Map<State, Row>()
     for (const state in yaml.table) {
@@ -57,7 +69,7 @@ export function descriptionFromYaml(rawYaml: string): Result<Description> {
         }
     }
 
-    return Result.ok(new Description(table, startState, blank, inputSeparator))
+    return Result.ok(new Description(table, startState, blank, inputSeparator, input))
 }
 
 function expandYamlArrayKeys(rawYaml: string): Result<string> {

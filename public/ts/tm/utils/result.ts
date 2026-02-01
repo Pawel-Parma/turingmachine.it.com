@@ -32,7 +32,7 @@ export class Result<T = void> {
         return this.error!
     }
 
-    addMsg(message: string, separator: string = ":"): Result<T> {
+    addMsg(message: any, separator: string = ":"): Result<T> {
         assert(this.isErr(), "cannot add message to a result without an error")
         this.error = new Error(`${this.error!.message}${separator} ${message}`)
         return this

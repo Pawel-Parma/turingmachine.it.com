@@ -5,12 +5,13 @@ export class Tape {
     blank: TSymbol
     head: number
     constructor(cells: TSymbol[], blank: TSymbol) {
-        this.cells = cells.slice()
+        this.cells = cells.length === 0 ? [blank] : cells.slice()
         this.blank = blank
         this.head = 0
     }
 
     read(): TSymbol {
+        console.log(this.cells[this.head]!)
         return this.cells[this.head]!
     }
 

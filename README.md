@@ -23,7 +23,8 @@ This will create `public/js` folder containing compiled JavaScript
 
 ### 3. Start `go` server
 ```bash
+cd ../..
 go run .
 ```
 
-The server will start on `localhost:3000` and serve from `public` folder
+The server will start on `localhost:3000` and serve content from `public` folder

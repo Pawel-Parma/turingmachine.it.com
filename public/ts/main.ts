@@ -3,7 +3,17 @@ import { Machine } from "./tm/machine.js"
 import { Optional } from "./tm/utils/types.js"
 
 
-let gMachine: Optional<Machine> = null
+var tm: Optional<Machine> = null
+var playInterval: number | undefined = undefined
+var ui = {
+    playButton: document.getElementById("playButton") as HTMLButtonElement,
+    pauseButton: document.getElementById("pauseButton") as HTMLButtonElement,
+    yamlInput: document.getElementById("yamlInput") as HTMLTextAreaElement,
+    tapeInput: document.getElementById("tapeInput") as HTMLInputElement,
+    tape: document.getElementById("tapeDisplay") as HTMLDivElement,
+    state: document.getElementById("stateDisplay") as HTMLSpanElement,
+    head: document.getElementById("headDisplay") as HTMLSpanElement,
+}
 
 
 function onClick(id: string, handler: () => void) {
@@ -16,58 +26,70 @@ window.addEventListener("load", loadMachine)
 onClick("loadYamlButton", loadMachine)
 
 onClick("loadTapeButton", () => {
-    if (!gMachine) {
+    if (!tm) {
         reportError("Load machine first")
         return
     }
-    gMachine.loadTape(readInput(gMachine.description.inputSeparator))
-    updateDisplay(gMachine)
+    tm.loadTape(readInput())
+    updateDisplay(tm)
 })
 
-onClick("stepButton", () => {
-    if (!gMachine) {
+onClick("undoButton", () => {
+    if (!tm) {
         reportError("Load machine first")
         return
     }
-    gMachine.step()
-    updateDisplay(gMachine)
+    tm.step()
+    updateDisplay(tm)
 })
 
-onClick("backButton", () => {
-    if (!gMachine) {
+onClick("executeButton", () => {
+    if (!tm) {
         reportError("Load machine first")
         return
     }
-    gMachine.back()
-    updateDisplay(gMachine)
+    tm.back()
+    updateDisplay(tm)
 })
+
+onClick("playButton", () => {
+    if (!tm) {
+        reportError("Load machine first")
+        return
+    }
+    var timeout = 1
+
+    startPlaying()
+
+    playInterval = setInterval(() => {
+        tm!.step()
+        updateDisplay(tm!)
+        if (tm!.halted) stopPlaying()
+    }, timeout)
+})
+
+onClick("pauseButton", stopPlaying)
 
 function reportError(error: any) {
     console.log(error)
 }
 
 function readYaml(): string {
-    const yamlInput = document.getElementById("yamlInput") as HTMLTextAreaElement
-    return yamlInput.value
+    return ui.yamlInput.value
 }
 
-function readInput(separator: string): string[] {
-    const tapeInput = document.getElementById("tapeInput") as HTMLInputElement
-    return tapeInput.value.split(separator)
+function readInput(): string {
+    return ui.tapeInput.value
 }
 
 function loadMachine() {
-    if (readYaml() == "") {
+    tm = newMachine()
+    if (tm === null) {
         return
     }
 
-    gMachine = newMachine()
-    if (gMachine === null) {
-        return
-    }
-
-    gMachine.loadTape(readInput(gMachine.description.inputSeparator))
-    updateDisplay(gMachine)
+    tm.loadTape(readInput())
+    updateDisplay(tm)
 }
 
 function newMachine(): Optional<Machine> {
@@ -88,6 +110,17 @@ function newMachine(): Optional<Machine> {
     return new Machine(description)
 }
 
+function startPlaying() {
+    ui.playButton.classList.add("hidden")
+    ui.pauseButton.classList.remove("hidden")
+}
+
+function stopPlaying() {
+    clearInterval(playInterval)
+    ui.playButton.classList.remove("hidden")
+    ui.pauseButton.classList.add("hidden")
+}
+
 function updateDisplay(machine: Machine) {
     updateCellsDisplay(machine)
     updateIndicatorsDisplay(machine)
@@ -95,16 +128,15 @@ function updateDisplay(machine: Machine) {
 
 // TODO: refactor
 function updateCellsDisplay(machine: Machine) {
-    const tapeDiv = document.getElementById("tapeDisplay")!
-    tapeDiv.innerHTML = ""
+    ui.tape.innerHTML = ""
 
     for (let i = 0; i <= machine.tape.cells.length; i++) {
         const cellVal = machine.tape.cells[i]
-        if (cellVal == null) { console.log("AA"); return }
+        if (cellVal == null) { return }
         const cellEl = document.createElement("div")
         cellEl.className = `tape-cell ${i === machine.tape.head ? 'active' : ''}`
         cellEl.textContent = cellVal
-        tapeDiv.appendChild(cellEl)
+        ui.tape.appendChild(cellEl)
 
         // Scroll the active cell into view
         if (i === machine.tape.head) {
@@ -114,9 +146,7 @@ function updateCellsDisplay(machine: Machine) {
 }
 
 function updateIndicatorsDisplay(machine: Machine) {
-    const stateDiv = document.getElementById("stateDisplay")!
-    stateDiv.textContent = machine.state
-
-    const headDiv = document.getElementById("headDisplay")!
-    headDiv.textContent = String(machine.tape.head)
+    ui.state.textContent = machine.state
+    ui.head.textContent = String(machine.tape.head)
 }
+

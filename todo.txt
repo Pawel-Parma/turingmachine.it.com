@@ -1,20 +1,21 @@
 TODO:
     - FRONTEND:
-        - make ui for the turing machine:
-            - input with keyboard shortcuts
-            - github link
-            - theme
-            - auto step with speed
+        - timout slider
+        - didable undo exe during play
+        - add copy current tape button
+        - add actions count
+        - input with keyboard shortcuts
+        - fix yamlexpand
         - give thorought explanation in /index and /about about synax and more 
         - better error messages and reporing
         - show unreferene states
         - examples and files
         - shareing machines
         - show transition table and flow graph
+        - own tooltip
 
     - BACKEND:
-        - count the amount of visits, or unique visits and display
-        - minify js
+        - count the amount of unique visits and display
 
 IDEAS:
     - non deterministic turing machine

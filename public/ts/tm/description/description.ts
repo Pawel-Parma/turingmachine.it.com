@@ -4,6 +4,7 @@ import { Result } from "../utils/result.js"
 
 export const defaultBlank: TSymbol = "_"
 export const defaultInputSeparator: string = ""
+export const defaultInput: string = ""
 
 export type Row = Map<TSymbol, Action>
 export type TransitionTable = Map<State, Row>
@@ -14,6 +15,7 @@ export class Description {
         public startState: State,
         public blank: TSymbol,
         public inputSeparator: string,
+        public input: string,
     ) { }
 
     verifyTransitionTable(): Result<void> {

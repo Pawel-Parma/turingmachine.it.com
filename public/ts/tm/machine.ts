@@ -24,8 +24,12 @@ export class Machine {
         this.history = []
     }
 
-    loadTape(cells: TSymbol[]) {
+    loadTape(input: string) {
         this.state = this.description.startState
+        if (input === "") {
+            input = this.description.input
+        }
+        const cells = input.split(this.description.inputSeparator)
         this.tape = new Tape(cells, this.description.blank)
         this.halted = false
     }

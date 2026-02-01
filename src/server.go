@@ -1,10 +1,13 @@
 package src
 
 import (
+	"compress/gzip"
 	"encoding/json"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 const public = "./public"
@@ -17,7 +20,7 @@ type Server struct {
 func NewServer(config *Config) *Server {
 	s := &Server{
 		mux:    http.NewServeMux(),
-		addres: ":" + strconv.Itoa(config.Port),
+		addres: config.Ip + ":" + strconv.Itoa(config.Port),
 	}
 
 	s.routes()
@@ -43,14 +46,12 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("/about", serveFile("about.html"))
 	s.mux.HandleFunc("/about.html", redirect("/about"))
 
-	s.mux.HandleFunc("/favicon.svg", serveFile("favicon.svg"))
-
 	s.mux.HandleFunc("/api/status", s.apiStatus)
 }
 
 func (s *Server) Start() {
-	Log.Info("Server starting", "address", "localhost"+s.addres)
-	err := http.ListenAndServe(s.addres, s.mux)
+	Log.Info("Server starting", "address", s.addres)
+	err := http.ListenAndServe(s.addres, gzipMiddleware(s.mux))
 	if err != nil {
 		Log.Error("Server failed", "err", err)
 	}
@@ -72,5 +73,37 @@ func (s *Server) apiStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]bool{
 		"running": true,
+	})
+}
+
+type gzipResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
+func gzipMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Add("Vary", "Accept-Encoding")
+
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+
+		gzw := gzipResponseWriter{
+			Writer:         gz,
+			ResponseWriter: w,
+		}
+
+		next.ServeHTTP(gzw, r)
+
 	})
 }

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+    <symbol id="logo" viewBox="0 0 512 512" fill="none">
+        <rect x="40" y="40" width="432" height="432" rx="60" fill="#6366f1"/>
+
+        <path d="M180 150H332M256 150V362" stroke="#f1f5f9" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <path d="M216 480L256 440L296 480" stroke="#6366f1" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+</svg>

@@ -3,111 +3,145 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="index, follow">
+
+    <link rel="modulepreload" href="/js/main.js" crossorigin>
+    <link rel="modulepreload" href="/js/tm/machine.js" crossorigin>
+    <link rel="modulepreload" href="/js/tm/action.js" crossorigin>
+    <link rel="modulepreload" href="/js/tm/tape.js" crossorigin>
+    <link rel="modulepreload" href="/js/tm/description/description.js" crossorigin>
+    <link rel="modulepreload" href="/js/tm/description/yaml.js" crossorigin>
+    <link rel="modulepreload" href="/js/tm/utils/result.js" crossorigin>
+    <link rel="modulepreload" href="/js/tm/utils/assert.js" crossorigin>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/index.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
 
     <title>Turing Machine Simulator</title>
     <meta name="description"
         content="Interactive Turing Machine simulator for visualizing states, tape movement, and execution step by step using YAML definitions.">
     <link rel="canonical" href="https://turingmachine.it.com/">
-
-    <meta name="robots" content="index, follow">
-
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="stylesheet" href="./css/index.css">
-    <script type="module" src="./js/main.js" defer></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Turing Machine Simulator",
+      "alternateName": ["TM Simulator"],
+      "url": "https://turingmachine.it.com/"
+    }
+    </script>
+    <meta property="og:title" content="Turing Machine Simulator">
+    <meta property="og:site_name" content="Turing Machine Simulator">
+    <meta property="og:url" content="https://turingmachine.it.com/">
+    <meta property="og:type" content="website">
 
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js" defer></script>
 
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" -->
-    <!--     defer> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script> -->
+    <script type="module" src="/js/main.js" defer></script>
 </head>
 
 <body>
-    <div class="app-container">
-        <header>
-            <div class="header-content">
-                <div class="header-left">
-                    <img src="favicon.svg" alt="Turing Machine Logo" style="width: 70px; height: 70px;">
-                    <h1>Turing Machine <span>Simulator</span></h1>
-                </div>
+    <header>
+        <div class="header">
+            <div class="header-left">
+                <svg width="70" height="70" class="logo">
+                    <use href="/icons/logo.svg#logo"></use>
+                </svg>
+                <!-- TODO: Fix space after Machine, fix breaking -->
+                <h1>uring Machine <span>Simulator</span></h1>
+            </div>
 
+            <div class="header-right">
                 <a href="https://github.com/Pawel-Parma/turingmachine.it.com" target="_blank" rel="noopener noreferrer"
-                    class="github-link" title="View on GitHub">
-                    <img src="/icons/github-cat-black.svg" alt="GitHub Repository"
-                        style="width: 50px; height: 50px; filter: brightness(0);">
+                    title="View on GitHub" class="github-link">
+                    <img src="/icons/github-cat/white-clearspace.svg" alt="GitHub Repository" width="60" height="60">
                 </a>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <main>
+    <main>
+        <div class="grid-layout">
+            <section class="execution-panel">
+                <div class="card">
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="label">State</span>
+                            <span id="stateDisplay" class="value">---</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">Head</span>
+                            <span id="headDisplay" class="value">0</span>
+                        </div>
+                    </div>
+
+                    <!--  TODO: understand what happens here -->
+                    <div class="tape-viewport">
+                        <div id="tapeDisplay" class="tape-track">
+                            <div></div>
+                            <!-- Cells will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button id="undoButton" class="secondary">
+                        <svg width="24" height="24">
+                            <use href="/icons/undo-step.svg#undo"></use>
+                        </svg>
+                        Undo Step
+                    </button>
+                    <button id="playButton" class="primary">
+                        <svg width="24" height="24">
+                            <use href="/icons/play.svg#play"></use>
+                        </svg>
+                        Play
+                    </button>
+                    <button id="pauseButton" class="primary hidden">
+                        <svg width="24" height="24">
+                            <use href="/icons/pause.svg#pause"></use>
+                        </svg>
+                        Pause
+                    </button>
+                    <button id="executeButton" class="action">
+                        <svg width="24" height="24">
+                            <use href="/icons/execute-step.svg#execute"></use>
+                        </svg>
+                        Execute Step
+                    </button>
+                </div>
+            </section>
+
             <!--  TODO: understand what happens here -->
-            <div class="grid-layout">
-                <section class="execution-panel">
-                    <div class="card viz-card">
-                        <div class="stats">
-                            <div class="stat-item">
-                                <span class="label">State</span>
-                                <span id="stateDisplay" class="value">---</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="label">Head</span>
-                                <span id="headDisplay" class="value">0</span>
-                            </div>
-                        </div>
-
-                        <div class="tape-viewport">
-                            <div id="tapeDisplay" class="tape-track">
-                                <!-- Cells will be injected here -->
-                            </div>
-                        </div>
+            <section class="config-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <label for="yamlInput">Machine Definition (YAML)</label>
                     </div>
+                    <textarea id="yamlInput" spellcheck="false"></textarea>
+                    <button id="loadYamlButton" class="primary glow"
+                        style="padding:0.7rem; margin-top: 0.5rem;">Initialize
+                        Machine</button>
+                </div>
 
-                    <div class="controls">
-                        <button id="backButton" class="btn-secondary">
-                            <!-- TODO: get icon -->
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
-                            </svg>
-                            Step Back
-                        </button>
-                        <button id="stepButton" class="btn-action">
-                            <!-- TODO: get icon  -->
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                            </svg>
-                            Next Step
-                        </button>
+                <div class="card">
+                    <div class="card-header">
+                        <label for="tapeInput">Initial Tape</label>
                     </div>
-                </section>
-
-                <section class="config-panel">
-                    <div class="card">
-                        <div class="card-header">
-                            <label for="yamlInput">Machine Definition (YAML)</label>
-                        </div>
-                        <!-- <div class="code-editor-container"> -->
-                        <!--     <pre id="highlighting" aria-hidden="true"><code class="language-yaml" -->
-                        <!--             id="highlighting-content"></code></pre> -->
-                        <textarea id="yamlInput" spellcheck="false"></textarea>
-                        <!-- </div> -->
-                        <button id="loadYamlButton" class="btn-primary">Initialize Machine</button>
+                    <div class="input-group">
+                        <input id="tapeInput" class="tape-input" type="text">
+                        <button id="loadTapeButton" class="action" style="padding:0.7rem; gap:0rem">Load</button>
                     </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <label for="tapeInput">Initial Tape</label>
-                        </div>
-                        <div class="input-group">
-                            <input id="tapeInput" type="text">
-                            <button id="loadTapeButton">Load</button>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+                </div>
+            </section>
+        </div>
+    </main>
 </body>
 
 </html>
