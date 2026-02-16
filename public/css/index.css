@@ -317,6 +317,7 @@ textarea {
 
 input[type="text"] {
     flex: 1;
+    min-width: 0px;
     padding: 0.625rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;

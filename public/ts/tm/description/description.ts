@@ -55,5 +55,7 @@ export class Description {
 
         return Array.from(unusedStates)
     }
+
+    // TODO: simplyfy
 }
 

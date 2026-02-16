@@ -1,77 +1,108 @@
 import { descriptionFromYaml } from "./tm/description/yaml.js"
 import { Machine } from "./tm/machine.js"
-import { Optional } from "./tm/utils/types.js"
+import { assert } from "./tm/utils/assert.js"
+import { Result } from "./tm/utils/result.js"
+import { bool } from "./tm/utils/types.js"
 
 
-var tm: Optional<Machine> = null
-var playInterval: number | undefined = undefined
-var ui = {
-    playButton: document.getElementById("playButton") as HTMLButtonElement,
-    pauseButton: document.getElementById("pauseButton") as HTMLButtonElement,
-    yamlInput: document.getElementById("yamlInput") as HTMLTextAreaElement,
-    tapeInput: document.getElementById("tapeInput") as HTMLInputElement,
-    tape: document.getElementById("tapeDisplay") as HTMLDivElement,
-    state: document.getElementById("stateDisplay") as HTMLSpanElement,
-    head: document.getElementById("headDisplay") as HTMLSpanElement,
+let initialized: bool = false
+let tm: Machine = undefined!
+let playInterval: number | undefined = undefined
+let timeout = 750
+let ui!: {
+    playButton: HTMLButtonElement
+    pauseButton: HTMLButtonElement
+    yamlInput: HTMLTextAreaElement
+    tapeInput: HTMLInputElement
+    tape: HTMLDivElement
+    state: HTMLSpanElement
+    head: HTMLSpanElement
 }
 
+window.addEventListener("load", () => {
+    loadElements()
+    bindEvents()
+    initialized = true
+
+    loadMachine()
+})
+
+function loadElements() {
+    ui = {
+        playButton: getElement("playButton"),
+        pauseButton: getElement("pauseButton"),
+        yamlInput: getElement("yamlInput"),
+        tapeInput: getElement("tapeInput"),
+        tape: getElement("tapeDisplay"),
+        state: getElement("stateDisplay"),
+        head: getElement("headDisplay"),
+    }
+}
+
+function getElement<T>(id: string): T {
+    const element = document.getElementById(id)
+    assert(element != null, "DOM element has to exist")
+    return element! as T
+}
+
+function bindEvents() {
+    onClick("loadYamlButton", loadMachine)
+
+    onClick("loadTapeButton", () => {
+        if (!isInitialized()) {
+            reportError("Load machine first")
+            return
+        }
+        tm.loadTape(readInput())
+        updateDisplay(tm)
+    })
+
+    onClick("undoButton", () => {
+        if (!isInitialized()) {
+            reportError("Load machine first")
+            return
+        }
+        tm.back()
+        updateDisplay(tm)
+    })
+
+    onClick("executeButton", () => {
+        if (!isInitialized()) {
+            reportError("Load machine first")
+            return
+        }
+        tm.step()
+        updateDisplay(tm)
+    })
+
+    onClick("playButton", () => {
+        if (!isInitialized()) {
+            reportError("Load machine first")
+            return
+        }
+
+        startPlaying()
+
+        playInterval = setInterval(() => {
+            tm.step()
+            updateDisplay(tm)
+            if (tm.halted) stopPlaying()
+        }, timeout)
+    })
+
+    onClick("pauseButton", stopPlaying)
+}
 
 function onClick(id: string, handler: () => void) {
     document.getElementById(id)!.addEventListener("click", handler)
 }
 
-
-window.addEventListener("load", loadMachine)
-
-onClick("loadYamlButton", loadMachine)
-
-onClick("loadTapeButton", () => {
-    if (!tm) {
-        reportError("Load machine first")
-        return
-    }
-    tm.loadTape(readInput())
-    updateDisplay(tm)
-})
-
-onClick("undoButton", () => {
-    if (!tm) {
-        reportError("Load machine first")
-        return
-    }
-    tm.step()
-    updateDisplay(tm)
-})
-
-onClick("executeButton", () => {
-    if (!tm) {
-        reportError("Load machine first")
-        return
-    }
-    tm.back()
-    updateDisplay(tm)
-})
-
-onClick("playButton", () => {
-    if (!tm) {
-        reportError("Load machine first")
-        return
-    }
-    var timeout = 1
-
-    startPlaying()
-
-    playInterval = setInterval(() => {
-        tm!.step()
-        updateDisplay(tm!)
-        if (tm!.halted) stopPlaying()
-    }, timeout)
-})
-
-onClick("pauseButton", stopPlaying)
-
 function reportError(error: any) {
     console.log(error)
+}
+
+function isInitialized(): bool {
+    return tm !== undefined && initialized === true
 }
 
 function readYaml(): string {
@@ -83,31 +114,31 @@ function readInput(): string {
 }
 
 function loadMachine() {
-    tm = newMachine()
-    if (tm === null) {
+    const res = newMachine()
+    if (res.isErr()) {
+        reportError(res.getError())
         return
     }
+    tm = res.getValue()
 
     tm.loadTape(readInput())
     updateDisplay(tm)
 }
 
-function newMachine(): Optional<Machine> {
+function newMachine(): Result<Machine> {
     const rawYaml = readYaml()
     var descriptionResult = descriptionFromYaml(rawYaml)
     if (descriptionResult.isErr()) {
-        reportError(descriptionResult.getError())
-        return null
+        return descriptionResult.cast()
     }
     const description = descriptionResult.getValue()
 
     var verifyResult = description.verifyTransitionTable()
     if (verifyResult.isErr()) {
-        reportError(verifyResult.getError())
-        return null
+        return verifyResult.cast()
     }
 
-    return new Machine(description)
+    return Result.ok(new Machine(description))
 }
 
 function startPlaying() {
