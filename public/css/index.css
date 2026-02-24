@@ -13,6 +13,11 @@
     --tape-cell-bg: #334155;
     --tape-cell-active-bg: #6366f1;
 
+    /* TODO:*/
+    --button-primary-disabled: #1e3a31;
+    --button-action-disabled: #312e81;
+    --button-secondary-disabled: #1e293b;
+
     --main-text: #f1f5f9;
     --muted-text: #94a3b8;
     --textarea-text: #818cf8;
@@ -78,42 +83,58 @@ button {
     transition: all 0.2s ease;
 }
 
-button:hover {
-    transform: translateY(-1px);
+button:disabled {
+    cursor: default;
+    color: var(--muted-text);
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
     filter: brightness(1.05);
 }
 
-button:active {
-    transform: translateY(1px);
+button:active:not(:disabled) {
+    transform: translateY(2px);
     filter: brightness(0.95);
 }
 
-button.glow:hover {
+button.glow:hover:not(:disabled) {
     transform: none;
     filter: none;
     box-shadow: 0 0 12px 1px var(--button-primary-bg);
 }
 
-button.glow:active {
+button.glow:active:not(:disabled) {
     transform: none;
     filter: brightness(0.95);
 }
 
-button.primary {
-    /* TODO: remove width: 100%; (is nessecary for Initialize Machine) */
-    width: 100%;
+button.primary:not(:disabled) {
     background: var(--button-primary-bg);
     color: var(--button-primary-text);
 }
 
-button.action {
+button.primary:disabled {
+    background: var(--button-primary-disabled);
+}
+
+button.action:not(:disabled) {
     background: var(--button-action-bg);
     color: var(--button-action-text);
 }
 
-button.secondary {
+button.action:disabled {
+    background: var(--button-action-disabled);
+}
+
+button.secondary:not(:disabled) {
     background: var(--button-secondary-bg);
     color: var(--button-secondary-text);
+}
+
+button.secondary:disabled {
+    background: var(--button-secondary-disabled);
 }
 
 /* Header */

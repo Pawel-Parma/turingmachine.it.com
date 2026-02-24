@@ -1,26 +1,24 @@
 TODO:
     - FRONTEND:
         - timout slider
-        - didable undo exe during play
         - add copy current tape button
         - add actions count
-        - input with keyboard shortcuts
+
         - fix yamlexpand
-        - give thorought explanation in /index and /about about synax and more 
+
+        - input with keyboard shortcuts
+
+        - give thorought explanation about synax and more 
         - better error messages and reporing
+        - representation as a table and flow graph
         - show unreferene states
         - examples and files
         - shareing machines
         - show transition table and flow graph
         - own tooltip
+        - ordering and autoformat
+        - input generator
 
     - BACKEND:
         - count the amount of unique visits and display
 
-IDEAS:
-    - non deterministic turing machine
-    - random input generator
-    - 2D turing machine  
-    - multi tape
-    - gui editor both as table and as flow graph
-    - ordering and autoformat
