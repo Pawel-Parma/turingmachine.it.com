@@ -27,6 +27,49 @@ window.addEventListener("load", () => {
     loadElements()
     bindEvents()
     initialized = true
+    // TODO: remove
+    ui.yamlInput.value = `# Add one to a binary number infinitly
+
+# Allows the tape to have multiple characters in a single cell
+# By splitting input by separator
+# For example if inputSeparator: "," and input: "1,10,2,20" then
+# the tape would be [1][10][2][20], optional field
+inputSeparator: ""
+
+# Defines the blank symbol, default is _, optional field
+blank: "_"
+
+# Overides tape input if it is empty, optional field
+input: 1010
+
+# Defines the start state, cane be "startState" or "start state"
+startState: MoveToStart
+
+# Defines the transition table
+table:
+ # State 
+ MoveToStart:
+  # Action definiton consists of Symbol or Symbol list and a value
+  # The value of a action is one of:
+  # : MOVE
+  # : { write?: SYMBOL, move: MOVE, nextState?: STATE }
+  # : { write?: SYMBOL, MOVE: STATE? }
+  # : [ WRITE, MOVE, STATE ]
+  # : [ WRITE, MOVE ]
+  # : [ MOVE, STATE ]
+  # Where ? means an optional field or value
+  # Not all symbols need to be defined in a state
+  # If the machine finds a SYMBOL not defined in the current STATE it halts
+  # It also halts if the value of a SYMBOL it finds is 
+  #  : { write: SYMBOL, move: N, nextState: STATE }
+  # Where SYMBOL is the symbol it found and STATE is the state it is in
+  [1, 0]: R
+  _: [ L, AddOne ]
+
+ AddOne:
+  [_, 0]: [ 1, R, AddOne ]
+  1: [ 0, L ]
+`
     loadMachine()
 })
 

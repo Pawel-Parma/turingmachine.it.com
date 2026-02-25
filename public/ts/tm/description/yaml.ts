@@ -33,6 +33,7 @@ export function descriptionFromYaml(rawYaml: string): Result<Description> {
     const blank = String(yaml.blank ?? defaultBlank)
     const inputSeparator = String(yaml.inputSeparator ?? defaultInputSeparator)
     const input: string = String(yaml.input ?? defaultInput)
+    // TODO: error on unexpected fields
 
     const table = new Map<State, Row>()
     for (const state in yaml.table) {
