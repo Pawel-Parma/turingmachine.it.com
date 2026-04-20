@@ -67,7 +67,7 @@ table:
   _: [ L, AddOne ]
 
  AddOne:
-  [_, 0]: [ 1, R, AddOne ]
+  [_, 0]: [ 1, R, MoveToStart ]
   1: [ 0, L ]
 `
     loadMachine()
